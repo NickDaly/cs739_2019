@@ -1,29 +1,44 @@
+UNAME := $(shell uname)
+
 DEBUG=0
 
-VPATH=./src/:./test
 SLIB=lib739kv.so
 EXEC=test
+
+VPATH=./src/:./test
 OBJDIR=./obj/
 
 CC=gcc
-CPP=g++ -std=c++11 -stdlib=libc++
+
+CPP=g++ -std=c++11 
+
 OPTS=-Ofast 
+
 LDFLAGS= -lm -pthread 
+
 COMMON= -Iinclude/ -Isrc/
+
 CFLAGS=-Wall -Wno-unused-result -Wno-unknown-pragmas -Wfatal-errors -fPIC
 
 ifeq ($(DEBUG), 1) 
-OPTS=-O0 -g
+	OPTS=-O0 -g
+endif
+
+#for clang we need to ad libc++
+ifeq ($(UNAME),Darwin)
+	CPP += -stdlib=libc++ 
 endif
 
 CFLAGS+=$(OPTS)
 
-OBJ=debug.o \
+#list of objects to build
+OBJ=debug.o  \
 	server.o \
 	lib739kv.o
 
+#the executable obj
 EXECOBJA=test.o
-	
+
 EXECOBJ = $(addprefix $(OBJDIR), $(EXECOBJA))
 
 OBJS = $(addprefix $(OBJDIR), $(OBJ))
