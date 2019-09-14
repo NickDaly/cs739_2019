@@ -2,8 +2,11 @@
 #include "lib739kv.h"
 
 int main() {
-	//std::cout << "Hello!" << std::endl;
+	std::cout << "test [begin]" << std::endl;
 	kv739_init(0);
-	std::cout << "main function\n";
+	kv739_shutdown();
+	kv739_get(0, 0);
+	kv739_put(0, 0, 0);
+	std::cout << "test [end]" << std::endl;
 	return 0;
 }
