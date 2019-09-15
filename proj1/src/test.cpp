@@ -1,12 +1,16 @@
 #include <iostream>
+#include "debug.h"
 #include "lib739kv.h"
 
+
 int main() {
-	std::cout << "test [begin]" << std::endl;
+	DEBUG_PRINT("main() [begin]");
+	
 	kv739_init(0);
-	kv739_shutdown();
 	kv739_get(0, 0);
 	kv739_put(0, 0, 0);
-	std::cout << "test [end]" << std::endl;
+	kv739_shutdown();
+
+	DEBUG_PRINT("main() [end]");
 	return 0;
 }
