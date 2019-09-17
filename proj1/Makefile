@@ -8,13 +8,13 @@ EXEC=test
 VPATH=./src/:./test
 OBJDIR=./obj/
 
-CC=gcc
+CC=gcc 
 
 CPP=g++ -std=c++11 
 
 OPTS=-Ofast 
 
-LDFLAGS= -lm -pthread 
+LDFLAGS= -lm -pthread -ldl 
 
 COMMON= -Iinclude/ -Isrc/
 
