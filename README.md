@@ -1,2 +1,2 @@
-# cs739_2019
-CS737 Distributed Systems Fall 2019
+# CS739 Fall 2019
+Project page for CS739 - Distributed Systems
