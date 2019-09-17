@@ -32,12 +32,13 @@ endif
 CFLAGS+=$(OPTS)
 
 #list of objects to build
-OBJ=debug.o  \
+OBJ=debug.o \
+	sqlite3.o \
 	server.o \
 	lib739kv.o
 
 #the executable obj
-EXECOBJA=test.o
+EXECOBJA=test.o 
 
 EXECOBJ = $(addprefix $(OBJDIR), $(EXECOBJA))
 
