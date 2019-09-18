@@ -23,10 +23,11 @@ int main() {
 	value.push_back('b');
 	value.push_back('c');
 
-	value_p newvalue;
-	value_p oldvalue;
+	std::vector<char> newvalue;
+	std::vector<char> oldvalue;
 	
 	std::string key = "foo";
+	
 	try {
 		ds.set(key, value, oldvalue);
 	}
@@ -42,13 +43,11 @@ int main() {
 		std::cout << "key:" << key << std::endl;
 
 		std::cout << "value:";
-		for (auto v:(*newvalue)) {
+		for (auto v:newvalue) {
 			std::cout << v ;
 		}
 		std::cout << std::endl;
-
-		std::cout << "time:" << t << std::endl;
-		
+		std::cout << "time:" << t << std::endl;		
 	}
 	catch (exception &ex) {
 		std::cerr << ex.what()  << " error_code: " << ex.code() << std::endl;

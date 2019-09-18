@@ -32,11 +32,12 @@ endif
 CFLAGS+=$(OPTS)
 
 #list of objects to build
-OBJ=debug.o \
-	sqlite3.o \
+OBJ=sqlite3.o \
+    debug.o \
+	sqlstatement.o \
 	datastore.o \
 	server.o \
-	lib739kv.o
+	lib739kv.o 
 
 #the executable obj
 EXECOBJA=test.o 
