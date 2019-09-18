@@ -33,7 +33,7 @@ data_store::~data_store() {
 
 
 void data_store::get(std::string &key, value_p &value, int64_t &timestamp) {
-	std::string sql = "SELECT key, value, timestamp from data_store WHERE key = ?;";
+	std::string sql = "SELECT key, value, timestamp from data_store WHERE key = ?";
 	sqlite3_stmt *stmt;
 	timestamp = 0;
 	value = nullptr;
@@ -65,8 +65,24 @@ void data_store::get(std::string &key, value_p &value, int64_t &timestamp) {
 
 
 void data_store::set(std::string &key, std::vector<char> &newvalue, value_p &oldvalue) {
-	oldvalue = nullptr;
 	std::string sql = "INSERT INTO data_store VALUES(?, ?, ?)";
+
+	value_p oldvalue;
+	int64_t ts;
+
+	try {
+		get(key, oldvalue, ts);
+		
+		std::string sql ="UPDATE data_store SET value = ?, timestamp = ? WHERE key = ?"
+		
+
+	}
+	catch (execute &ex) {
+
+	}
+
+	oldvalue = nullptr;
+	
 	sqlite3_stmt *stmt;
 	
 	auto ret = sqlite3_prepare_v2(pDb_, sql.c_str(), -1, &stmt, 0);
