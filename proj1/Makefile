@@ -34,6 +34,7 @@ CFLAGS+=$(OPTS)
 #list of objects to build
 OBJ=debug.o \
 	sqlite3.o \
+	datastore.o \
 	server.o \
 	lib739kv.o
 
