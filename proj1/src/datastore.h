@@ -14,7 +14,7 @@ class data_store {
 public:
 	data_store(std::string &filename);
 	virtual ~data_store();
-	void get(std::string &key, value_p &value);
+	void get(std::string &key, value_p &value, int64_t &timestamp);
 	void set(std::string &key, std::vector<char> &newvalue, value_p &oldvalue);
 private:
 	std::string filename_;

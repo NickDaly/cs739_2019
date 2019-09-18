@@ -27,13 +27,33 @@ int main() {
 	value_p oldvalue;
 	
 	std::string key = "foo";
-
 	try {
 		ds.set(key, value, oldvalue);
 	}
 	catch (exception &ex) {
 		std::cerr << ex.what()  << " error_code: " << ex.code() << std::endl;
 	}
+
+	try {
+		int64_t t;
+
+		ds.get(key, newvalue, t);
+
+		std::cout << "key:" << key << std::endl;
+
+		std::cout << "value:";
+		for (auto v:(*newvalue)) {
+			std::cout << v ;
+		}
+		std::cout << std::endl;
+
+		std::cout << "time:" << t << std::endl;
+		
+	}
+	catch (exception &ex) {
+		std::cerr << ex.what()  << " error_code: " << ex.code() << std::endl;
+	}
+
 
 	DEBUG_PRINT("main() [end]");
 	return 0;

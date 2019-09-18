@@ -1,5 +1,6 @@
 #include "datastore.h"
 
+
 data_store::data_store(std::string &filename) {
 	DEBUG_PRINT("data_store::data_store() [begin]");
 	//file:/home/fred/data.db
@@ -20,6 +21,7 @@ data_store::data_store(std::string &filename) {
 	DEBUG_PRINT("data_store::data_store() [end]");
 }
 
+
 data_store::~data_store() {
 	DEBUG_PRINT("data_store::~data_store() [begin]");
 	if (pDb_) {
@@ -29,9 +31,12 @@ data_store::~data_store() {
 	DEBUG_PRINT("data_store::~data_store() [end]");
 }
 
-void data_store::get(std::string &key, value_p &value) {
+
+void data_store::get(std::string &key, value_p &value, int64_t &timestamp) {
 	std::string sql = "SELECT key, value, timestamp from data_store WHERE key = ?;";
 	sqlite3_stmt *stmt;
+	timestamp = 0;
+	value = nullptr;
 
 	auto ret = sqlite3_prepare_v2(pDb_, sql.c_str(), -1, &stmt, 0);
     if (ret != SQLITE_OK) {
@@ -43,9 +48,21 @@ void data_store::get(std::string &key, value_p &value) {
     	throw exception("Faild to bind key variable:" + std::string(sqlite3_errmsg(pDb_)), ret);
     }
 
-    ret = sqlite3_step( stmt);
+    ret = sqlite3_step(stmt);
+    
+    if (ret == SQLITE_ROW) {
+		int length = sqlite3_column_bytes(stmt, 1);
+		auto v = std::make_shared<std::vector<char>> (length);
+		auto *pbuf = reinterpret_cast<const char*>( sqlite3_column_blob(stmt, 1));
+		std::copy(pbuf, pbuf + v->size(), v->data());
+    	value = v;
+  	   	timestamp = sqlite3_column_int64(stmt, 2);
+    }
+    
+    sqlite3_finalize(stmt);
    
 }
+
 
 void data_store::set(std::string &key, std::vector<char> &newvalue, value_p &oldvalue) {
 	oldvalue = nullptr;
