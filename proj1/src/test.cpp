@@ -1,7 +1,6 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "debug.h"
 #include "lib739kv.h"
 #include "datastore.h"
 
@@ -29,7 +28,12 @@ int main() {
 	
 	std::string key = "foo";
 
-	ds.set(key, value, oldvalue);
+	try {
+		ds.set(key, value, oldvalue);
+	}
+	catch (exception &ex) {
+		std::cerr << ex.what()  << " error_code: " << ex.code() << std::endl;
+	}
 
 	DEBUG_PRINT("main() [end]");
 	return 0;
