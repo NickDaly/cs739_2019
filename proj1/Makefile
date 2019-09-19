@@ -5,7 +5,7 @@ DEBUG=0
 SLIB=lib739kv.so
 EXEC=test
 
-VPATH=./src/:./test
+VPATH=./src/:./tests
 OBJDIR=./obj/
 
 CC=gcc 
@@ -24,7 +24,7 @@ ifeq ($(DEBUG), 1)
 	OPTS=-O0 -g
 endif
 
-#for clang we need to ad libc++
+#for MacOS clang we need to add libc++
 ifeq ($(UNAME),Darwin)
 	CPP += -stdlib=libc++ 
 endif
