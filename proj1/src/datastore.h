@@ -18,13 +18,23 @@ public:
 	virtual ~data_store();
 
 	bool get(std::string &key, std::vector<char> &value, int64_t &timestamp);
+	bool set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp);
+
+
+	bool get(const char *key, std::vector<char> &value, int64_t &timestamp) {
+		std::string s(key);
+		return get(s, value, timestamp);
+	}
 
 	bool get(std::string &key, std::vector<char> &value) {
 		int64_t ts;
 		return get(key, value, ts);
+	}	
+	
+	bool set(const char *key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {
+		std::string s(key);
+		return set(s, newvalue, oldvalue, timestamp);
 	}
-
-	bool set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp);
 
 	bool set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue) {
 		int64_t ts;
@@ -34,6 +44,23 @@ public:
 	bool set(std::string &key, std::vector<char> &newvalue) {
 		std::vector<char> oldvalue;
 		return set(key, newvalue, oldvalue);		
+	}
+	
+	bool set(const char *key, std::vector<char> &newvalue) {
+		std::string s(key);
+		return set(s, newvalue);
+	}
+
+	bool set(const char *key, const char *value) {
+		std::vector<char> data(value, value + strlen(value));
+		std::string s(key);
+		return set(s, data);
+	}
+
+	bool set(const char *key, const char *value, std::vector<char> &oldvalue) {
+		std::vector<char> data(value, value + strlen(value));
+		std::string s(key);
+		return set(s, data, oldvalue);
 	}
 
 private:

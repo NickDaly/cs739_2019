@@ -71,23 +71,30 @@ bool sql_statement::read() {
 
 
 std::string sql_statement::read_text(int col) {
-	
-	return "";
+	std::string str;
+	int size =  sqlite3_column_bytes(stmt_, col);
+	str.resize(size);
+	char *src = (char*) sqlite3_column_text(stmt_, col);
+	for (int i=0; i<size;  ++i)  {
+		str[i] = src[i];
+	}
+	return str;
 }
 
 
 int sql_statement::read_blob(int col, const char *buffer, int length) {
 	if (buffer==0 || length==0) {
-		return sqlite3_column_bytes(stmt_, col);
+		int len = sqlite3_column_bytes(stmt_, col);
+		return len;
 	}
 	else {
- 	 	auto *src = reinterpret_cast<const char*>( sqlite3_column_blob(stmt_, col));
+ 	 	char *src = (char*) sqlite3_column_blob(stmt_, col);
+ 	 	memcpy((void*)buffer, (void*)src, length);
 	}
 	return 0;
 }
 
 
-int64_t sql_statement::read_int64(int col) {
-	
-	return 0;
+int64_t sql_statement::read_int64(int col) {	
+	return sqlite3_column_int64(stmt_, col);
 }
