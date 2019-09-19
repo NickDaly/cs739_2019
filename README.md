@@ -69,4 +69,5 @@ It should be straightforward to develop an eventually-consistent system.  This l
 
 ## Some considerations
 - Should sync happen at the read, or write? 
--- read
+### read 
+Find the latest copy among the servers send it to the requester, all other client update there stale copy
