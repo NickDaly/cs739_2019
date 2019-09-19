@@ -68,3 +68,5 @@ It should be straightforward to develop an eventually-consistent system.  This l
 
 
 ## Some considerations
+- Should sync happen at the read, or write? 
+-- read
