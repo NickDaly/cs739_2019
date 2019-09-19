@@ -2,6 +2,7 @@
 #include <ratio>
 #include <chrono>
 #include <cstdint>
+#include <ctype.h>
 
 #include "datastore.h"
 #include "sqlstatement.h"
@@ -46,6 +47,10 @@ data_store::~data_store() {
 
 
 bool data_store::get(std::string &key, std::vector<char> &value, int64_t &timestamp) {
+	
+	if (validate_key(key)) {
+		throw exception("sdata_store::get(): Invalid key");
+	}
 
 	sql_statement stmt(db_);
 	std::string sql = "SELECT key, value, timestamp from data_store WHERE key = ?";
@@ -76,6 +81,16 @@ bool data_store::get(std::string &key, std::vector<char> &value, int64_t &timest
 
 
 bool data_store::set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {	
+
+	if (validate_key(key)) {
+		throw exception("sdata_store::set(): Invalid key");
+	}
+
+
+	if (validate_value(newvalue)) {
+		throw exception("sdata_store::set(): Invalid value");
+	}
+
 	sql_statement stmt(db_);
 
 	auto ts = get_timestamp();
@@ -95,6 +110,36 @@ bool data_store::set(std::string &key, std::vector<char> &newvalue, std::vector<
 		stmt.bind_blob(2, newvalue.data(), newvalue.size());
 		stmt.bind_int64(3, ts);
 		stmt.execute();
+	}
+
+	return true;
+}
+
+bool data_store::validate_key(const std::string &key) {
+	if (key.length()==0) return false;
+
+	if (key.length()>MAX_KEY_LEN) {
+		return false;
+	}
+
+	for (auto c:key) {
+		if (!isprint(c)) return false;
+		if (c=='[' || c==']') return false;
+		if (c>127) return false;
+	}
+	
+	return true;
+}
+
+bool data_store::validate_value(const std::vector<char> &data) {
+
+	if (data.size()>MAX_KEY_LEN) {
+		return false;
+	}
+	for (auto c:data) {
+		if (!isprint(c)) return false;
+		if (c=='[' || c==']') return false;
+		if (c>127) return false;
 	}
 
 	return true;

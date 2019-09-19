@@ -10,6 +10,10 @@
 #include "sqlstatement.h"
 
 
+#define MAX_KEY_LEN 128
+#define MAX_VALUE_LEN 2048
+#define INVALID_CHARS "[]"
+
 using value_p = std::shared_ptr<std::vector<char>>;
 
 class data_store {
@@ -17,9 +21,10 @@ public:
 	data_store(std::string &filename);
 	virtual ~data_store();
 
-	bool get(std::string &key, std::vector<char> &value, int64_t &timestamp);
-	bool set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp);
-
+	virtual bool get(std::string &key, std::vector<char> &value, int64_t &timestamp);
+	virtual bool set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp);
+	virtual bool validate_key(const std::string &key);
+	virtual bool validate_value(const std::vector<char> &data);
 
 	bool get(const char *key, std::vector<char> &value, int64_t &timestamp) {
 		std::string s(key);
