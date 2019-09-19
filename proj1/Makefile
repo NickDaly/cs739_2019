@@ -68,4 +68,4 @@ obj:
 .PHONY: clean
 
 clean:
-	rm -rf $(OBJS) $(SLIB) $(EXEC) $(EXECOBJ) $(OBJDIR)
+	rm -rf $(OBJS) $(SLIB) $(EXEC) $(EXECOBJ) $(OBJDIR) test.db
