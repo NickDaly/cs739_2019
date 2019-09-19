@@ -65,3 +65,6 @@ It should be straightforward to develop an eventually-consistent system.  This l
 ### Backend
 
 - A distributed backend datastore that communicates between servers to find data.
+
+
+## Some considerations
