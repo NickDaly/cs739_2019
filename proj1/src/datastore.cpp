@@ -13,7 +13,7 @@ int64_t get_timestamp() {
 data_store::data_store(std::string &filename) {
 	DEBUG_PRINT("data_store::data_store() [begin]");
 	//file:/home/fred/data.db
-	
+	DEBUG_PRINT("  Creating db connection to '%s'...", filename.c_str());
 	filename_ = filename;
 	
 	auto ret = sqlite3_open(filename.c_str(), &db_);
@@ -28,7 +28,7 @@ data_store::data_store(std::string &filename) {
  	if (ret!=SQLITE_OK) {
  		throw exception("Error creating the date_store table", ret);
  	}
-	
+	DEBUG_PRINT("  done");
 	DEBUG_PRINT("data_store::data_store() [end]");
 }
 
@@ -36,8 +36,10 @@ data_store::data_store(std::string &filename) {
 data_store::~data_store() {
 	DEBUG_PRINT("data_store::~data_store() [begin]");
 	if (db_) {
+		DEBUG_PRINT("  closing db connection...");
 		sqlite3_close(db_);
 		db_ = nullptr;
+		DEBUG_PRINT("  done");
 	}
 	DEBUG_PRINT("data_store::~data_store() [end]");
 }
@@ -94,6 +96,6 @@ bool data_store::set(std::string &key, std::vector<char> &newvalue, std::vector<
 		stmt.bind_int64(3, ts);
 		stmt.execute();
 	}
-	
+
 	return true;
 }

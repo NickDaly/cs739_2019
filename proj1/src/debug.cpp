@@ -18,7 +18,7 @@ void output_debug_string(const char *message) {
  	nowtm = localtime(&nowtime);
  	strftime(tmbuf, sizeof tmbuf, "%Y-%m-%d %H:%M:%S", nowtm);
  	snprintf(buf, sizeof buf, "%s.%06ld", tmbuf, (long) tv.tv_usec);
-  	std::cout << "[" << buf << "]:[" << pid << "]: " << message ;
+  	std::cout << "[" << buf << "]:[" << pid << "]:" << message ;
 }
 
 
