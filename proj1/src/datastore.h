@@ -17,24 +17,23 @@ public:
 	data_store(std::string &filename);
 	virtual ~data_store();
 
-	void get(std::string &key, std::vector<char> &value, int64_t &timestamp);
+	bool get(std::string &key, std::vector<char> &value, int64_t &timestamp);
 
-	void get(std::string &key, std::vector<char> &value) {
+	bool get(std::string &key, std::vector<char> &value) {
 		int64_t ts;
-		get(key, value, ts);
+		return get(key, value, ts);
 	}
 
+	bool set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp);
 
-	void set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp);
-
-	void set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue) {
+	bool set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue) {
 		int64_t ts;
-		set(key, newvalue, oldvalue, ts);
+		return set(key, newvalue, oldvalue, ts);
 	}
 
-	void set(std::string &key, std::vector<char> &newvalue) {
+	bool set(std::string &key, std::vector<char> &newvalue) {
 		std::vector<char> oldvalue;
-		set(key, newvalue, oldvalue);		
+		return set(key, newvalue, oldvalue);		
 	}
 
 private:

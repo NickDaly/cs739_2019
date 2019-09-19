@@ -37,26 +37,26 @@ void sql_statement::execute() {
 }
 
 
-void sql_statement::bind_txt(const std::string &txt, int pos) {
+void sql_statement::bind_text(int pos, const std::string &txt) {
 	auto ret = sqlite3_bind_text(stmt_, pos, txt.c_str(), -1, 0);
 	if (ret != SQLITE_OK) {
-		throw exception("sql_statement::bind_txt(): " + std::string(sqlite3_errmsg(db_)), ret);
+		throw exception("sql_statement::bind_text(): " + std::string(sqlite3_errmsg(db_)), ret);
 	}
 }
 
 
-void sql_statement::bind_blob(const char *blob, int length, int pos) {
-	auto ret = sqlite3_bind_blob(stmt_, pos, blob, length, SQLITE_STATIC);
+void sql_statement::bind_blob(int pos, const char *buffer, int length) {
+	auto ret = sqlite3_bind_blob(stmt_, pos, buffer, length, SQLITE_STATIC);
 	if (ret != SQLITE_OK) {
 		throw exception("sql_statement::bind_blob():" + std::string(sqlite3_errmsg(db_)), ret);
 	}
 }
 
 
-void sql_statement::bind_int64(int64_t value, int pos) {
+void sql_statement::bind_int64(int pos, int64_t value) {
 	auto ret = sqlite3_bind_int64(stmt_, pos, value);
 	if (ret != SQLITE_OK) {
-		throw exception("Faild to bind int64:" + std::string(sqlite3_errmsg(db_)), ret);
+		throw exception("sql_statement::bind_int64():" + std::string(sqlite3_errmsg(db_)), ret);
 	}
 }
 
@@ -76,8 +76,13 @@ std::string sql_statement::read_text(int col) {
 }
 
 
-int sql_statement::read_blob(const char *buffer, int length) {
-	
+int sql_statement::read_blob(int col, const char *buffer, int length) {
+	if (buffer==0 || length==0) {
+		return sqlite3_column_bytes(stmt_, col);
+	}
+	else {
+ 	 	auto *src = reinterpret_cast<const char*>( sqlite3_column_blob(stmt_, col));
+	}
 	return 0;
 }
 

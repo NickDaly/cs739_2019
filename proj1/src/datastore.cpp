@@ -1,5 +1,14 @@
-#include "datastore.h"
+#include <ctime>
+#include <ratio>
+#include <chrono>
+#include <cstdint>
 
+#include "datastore.h"
+#include "sqlstatement.h"
+
+int64_t get_timestamp() {
+	return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+}
 
 data_store::data_store(std::string &filename) {
 	DEBUG_PRINT("data_store::data_store() [begin]");
@@ -34,12 +43,52 @@ data_store::~data_store() {
 }
 
 
-void data_store::get(std::string &key, std::vector<char> &value, int64_t &timestamp) {
+bool data_store::get(std::string &key, std::vector<char> &value, int64_t &timestamp) {
+	std::cout << "get:" << get_timestamp() << std::endl;
+	sql_statement stmt(db_);
+	std::string sql = "SELECT value, timestamp from data_store WHERE key = ?";
 
+	stmt.prepare(sql);
+	stmt.bind_text(1, key);
+
+	if (stmt.read()) {		
+		//get the blob length
+		int len = stmt.read_blob(0, 0, 0);
+		//make sure the vector is in the same length
+		value.resize(len);
+		//read the value
+		len = stmt.read_blob(0, value.data(), len);
+		timestamp = stmt.read_int64(1);
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
-void data_store::set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {
 
+bool data_store::set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {
+	std::cout << "set:" << get_timestamp() << std::endl;
+	sql_statement stmt(db_);
+
+	auto ts = get_timestamp();
+	if (get(key, oldvalue, timestamp)) {
+		std::string sql = "UPDATE data_store SET value = ?, timestamp = ? WHERE key = ?";
+		stmt.prepare(sql);
+		stmt.bind_blob(1, newvalue.data(), newvalue.size());
+		stmt.bind_int64(2, ts);
+		stmt.bind_text(3, key);
+		stmt.execute();
+	}
+	else {
+		std::string sql = "INSERT INTO data_store VALUES(?, ?, ?)";
+		stmt.prepare(sql);
+		stmt.bind_text(1, key);
+		stmt.bind_blob(2, newvalue.data(), newvalue.size());
+		stmt.bind_int64(3, ts);
+		stmt.execute();
+	}
+	return true;
 }
 
 
