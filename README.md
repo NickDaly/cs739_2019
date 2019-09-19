@@ -12,7 +12,7 @@ Project page for CS739 - Distributed Systems
 
 These are components we do or may need:
 
-1. Demon (Sek)
+1. Daemon (Sek)
 2. IPC (Sek)
 3. Backend data store (Sek) :white_check_mark:
 4. Server-to-server communication protocol (Nick)
