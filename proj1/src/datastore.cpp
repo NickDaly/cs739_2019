@@ -11,6 +11,7 @@ int64_t get_timestamp() {
 	return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 }
 
+
 data_store::data_store(std::string &filename) {
 	DEBUG_PRINT("data_store::data_store() [begin]");
 	//file:/home/fred/data.db
@@ -115,6 +116,7 @@ bool data_store::set(std::string &key, std::vector<char> &newvalue, std::vector<
 	return true;
 }
 
+
 bool data_store::validate_key(const std::string &key) {
 
 	if (key.length()==0) {
@@ -140,6 +142,7 @@ bool data_store::validate_key(const std::string &key) {
 	
 	return true;
 }
+
 
 bool data_store::validate_value(const std::vector<char> &data) {
 

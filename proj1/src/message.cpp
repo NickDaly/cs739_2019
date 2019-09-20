@@ -9,33 +9,41 @@ message::message() {
 	header_.id = 0;
 }
 
+
 message::~message() {
 
 }
+
 
 int64_t message::get_param() const  {
 	return header_.param;
 }
 
+
 void message::set_param(int64_t param) {
 	header_.param = param;
 }
+
 
 void message::set_key_size(int len) {
 	header_.key_size = len;
 }
 
+
 int message::get_key_size() const {
 	return header_.key_size;
 }
+
 
 void message::set_value_size(int len) {
 	header_.value_size = len;
 }
 
+
 int message::get_value_size() const {
 	return header_.value_size;
 }
+
 
 void message::set_key(const char* key) {
 	auto len = strlen(key);	
@@ -45,15 +53,18 @@ void message::set_key(const char* key) {
 	payload[len] = 0;	
 }
 
+
 void message::set_value(const char* val, int len) {
 	assert(len>=0 && len<MAX_VALUE_SIZE );
 	set_value_size(len);
 	memcpy((void*) value(), (void*) val, len);
 }
 
+
 const char *message::key() {
 	return payload;
 }
+
 
 const char *message::value() {
 	return payload + header_.key_size + 1;
