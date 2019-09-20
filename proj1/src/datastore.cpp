@@ -81,12 +81,11 @@ bool data_store::get(std::string &key, std::vector<char> &value, int64_t &timest
 }
 
 
-bool data_store::set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {	
+bool data_store::put(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {	
 
 	if (!validate_key(key)) {
 		throw exception("sdata_store::set(): Invalid key", -1);
 	}
-
 
 	if (!validate_value(newvalue)) {
 		throw exception("sdata_store::set(): Invalid value", -1);

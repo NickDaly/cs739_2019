@@ -20,7 +20,7 @@ public:
 	virtual ~data_store();
 
 	virtual bool get(std::string &key, std::vector<char> &value, int64_t &timestamp);
-	virtual bool set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp);
+	virtual bool put(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp);
 	virtual bool validate_key(const std::string &key);
 	virtual bool validate_value(const std::vector<char> &data);
 
@@ -34,36 +34,36 @@ public:
 		return get(key, value, ts);
 	}	
 	
-	bool set(const char *key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {
+	bool put(const char *key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {
 		std::string s(key);
-		return set(s, newvalue, oldvalue, timestamp);
+		return put(s, newvalue, oldvalue, timestamp);
 	}
 
-	bool set(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue) {
+	bool put(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue) {
 		int64_t ts;
-		return set(key, newvalue, oldvalue, ts);
+		return put(key, newvalue, oldvalue, ts);
 	}
 
-	bool set(std::string &key, std::vector<char> &newvalue) {
+	bool put(std::string &key, std::vector<char> &newvalue) {
 		std::vector<char> oldvalue;
-		return set(key, newvalue, oldvalue);		
+		return put(key, newvalue, oldvalue);		
 	}
 	
-	bool set(const char *key, std::vector<char> &newvalue) {
+	bool put(const char *key, std::vector<char> &newvalue) {
 		std::string s(key);
-		return set(s, newvalue);
+		return put(s, newvalue);
 	}
 
-	bool set(const char *key, const char *value) {
+	bool put(const char *key, const char *value) {
 		std::vector<char> data(value, value + strlen(value));
 		std::string s(key);
-		return set(s, data);
+		return put(s, data);
 	}
 
-	bool set(const char *key, const char *value, std::vector<char> &oldvalue) {
+	bool put(const char *key, const char *value, std::vector<char> &oldvalue) {
 		std::vector<char> data(value, value + strlen(value));
 		std::string s(key);
-		return set(s, data, oldvalue);
+		return put(s, data, oldvalue);
 	}
 
 private:

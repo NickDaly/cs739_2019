@@ -33,8 +33,8 @@ void test_kv_store() {
 	
 	try {		
 		std::vector<char> ov;
-		ds.set("foo", "Hello World!");	
-		ds.set("foo", "Goodbye World!", ov);
+		ds.put("foo", "Hello World!");	
+		ds.put("foo", "Goodbye World!", ov);
 		std::cout << "old value: " << vec2str(ov) << std::endl;
 	}
 	catch (exception &ex) {
