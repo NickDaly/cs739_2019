@@ -84,11 +84,11 @@ bool data_store::get(std::string &key, std::vector<char> &value, int64_t &timest
 bool data_store::put(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {	
 
 	if (!validate_key(key)) {
-		throw exception("sdata_store::set(): Invalid key", -1);
+		throw exception("sdata_store::put(): Invalid key", -1);
 	}
 
 	if (!validate_value(newvalue)) {
-		throw exception("sdata_store::set(): Invalid value", -1);
+		throw exception("sdata_store::put(): Invalid value", -1);
 	}
 
 	sql_statement stmt(db_);
@@ -118,25 +118,15 @@ bool data_store::put(std::string &key, std::vector<char> &newvalue, std::vector<
 
 bool data_store::validate_key(const std::string &key) {
 
-	if (key.length()==0) {
-		std::cout << 1 << std::endl;
-		return false;
-	}
-
+	if (key.length()==0) return false;
+	
 	if (key.length()>MAX_KEY_LEN) {
-		std::cout << 2 << std::endl;
 		return false;
 	}
 
 	for (auto c:key) {
-		if (!isprint(c)) {
-					std::cout << 3 << std::endl;
-			return false;
-		}
-		if (c=='[' || c==']') {
-					std::cout << 4 << std::endl;
-			return false;		
-		}
+		if (!isprint(c)) return false;		
+		if (c=='[' || c==']') return false;			
 	}
 	
 	return true;
