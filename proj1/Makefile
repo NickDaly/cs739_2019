@@ -36,6 +36,7 @@ OBJ=sqlite3.o \
     debug.o \
 	sqlstatement.o \
 	datastore.o \
+	message.o \
 	server.o \
 	lib739kv.o 
 

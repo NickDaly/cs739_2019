@@ -2,7 +2,7 @@
 #include <ratio>
 #include <chrono>
 #include <cstdint>
-#include <ctype.h>
+#include <cctype>
 
 #include "datastore.h"
 #include "sqlstatement.h"
