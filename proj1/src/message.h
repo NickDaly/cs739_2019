@@ -24,22 +24,22 @@ public:
 	int64_t get_param() const;
 	void set_param(int64_t param);
 	
-	void set_key_size(int len);
 	int  get_key_size() const;
-	
-	void set_value_size(int len);
-	int  get_value_size() const;
-	
 	void set_key(const char* key);
-
-	void set_value(const char* value, int len);
 	
+	int  get_value_size() const;
+	void set_value(const char* value, int len);
+
 	//returns the pointer to the key string
 	const char *key();
-
+	
 	//returns the pointers to the value
 	const char *value();
+
 private:
+	void set_key_size(int len);
+	void set_value_size(int len);
+
 	header_t header_;
 	char payload[MSG_SIZE-sizeof(header_t)];	
 };

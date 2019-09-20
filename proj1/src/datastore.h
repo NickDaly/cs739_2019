@@ -9,10 +9,8 @@
 #include "sqlite3.h"
 #include "sqlstatement.h"
 
-
 #define MAX_KEY_LEN 128
 #define MAX_VALUE_LEN 2048
-#define INVALID_CHARS "[]"
 
 using value_p = std::shared_ptr<std::vector<char>>;
 
