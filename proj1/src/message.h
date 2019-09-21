@@ -7,9 +7,20 @@
 
 #define MSG_SIZE 4096
 
+enum class command: int32_t
+{
+	CHK,
+	OK,
+    GET,
+    PUT,
+    ERROR,
+    SHUT_DOWN
+};
+
+
 typedef struct header {
 	int64_t id;
-	int32_t command;
+	command cmd;
 	int64_t param;
 	int32_t key_size;
 	int32_t value_size;
@@ -18,7 +29,8 @@ typedef struct header {
 
 class message {
 public:
-	message();
+
+	message(command cmd);
 	~message();
 	
 	int64_t get_param() const;

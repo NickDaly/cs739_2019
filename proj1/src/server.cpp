@@ -1,21 +1,70 @@
-#include "debug.h"
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include "server.h"
+#include "exception.h"
 
-
-server::server(int port) {
-	DEBUG_PRINT("server::server(%d)", port);
+server::server(const std::string &host, int port) {
+	DEBUG_PRINT("server::server() [begin]");
+	DEBUG_PRINT("server::server() host=%s, port=%d", host.c_str(), port);
 	port_ = port;
+	host_ = host;
+	DEBUG_PRINT("server::server() [end]");
 }
 
-server:: ~server() {
-	DEBUG_PRINT("server:: ~server()");
+
+server::~server() {
+	DEBUG_PRINT("server::~server() [begin]");
+
+	DEBUG_PRINT("server::~server() [end]");
 }
+
 
 void server::serve() {
 
+ 	int sockfd;
+ 	int newsockfd;
+
+    struct sockaddr_in serv_addr; 
+    struct sockaddr_in cli_addr;
+ 	
+ 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) { 
+        throw exception("server::serve() Error opening socket", errno);
+    }
+
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = INADDR_ANY;
+    serv_addr.sin_port = htons(port_);
+
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr))!=0 ) {
+    	throw exception("server::serve() Error binding socket to port", errno);
+	}
+    
+    if (listen(sockfd, 5)!=0) {
+    	throw exception("server::serve() Error binding socket to port", errno);
+    }
+
+    socklen_t clilen = sizeof(cli_addr);
+    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+    if (newsockfd < 0) {
+    	throw exception("server::serve() Error accepting connection", errno);
+    }
+
+     //      error("ERROR on accept");
+     // bzero(buffer,256);
+     // n = read(newsockfd,buffer,255);
+     // if (n < 0) error("ERROR reading from socket");
+     // printf("Here is the message: %s\n",buffer);
+     // n = write(newsockfd,"I got your message",18);
+     // if (n < 0) error("ERROR writing to socket");
+     // return 0; 
 }
 
+
 void server::shutdown() {
+
 
 }
 

@@ -4,8 +4,9 @@ DEBUG=0
 
 SLIB=lib739kv.so
 EXEC=test
+EXECS=test test_server
 
-VPATH=./src/:./tests
+VPATH=./src/:./testing
 OBJDIR=./obj/
 
 CC=gcc 
@@ -38,21 +39,22 @@ OBJ=sqlite3.o \
 	datastore.o \
 	message.o \
 	server.o \
-	lib739kv.o 
+	lib739kv.o \
 
-#the executable obj
-EXECOBJA=test.o 
+#list of executable to build  
+EXEC = test test_server
 
-EXECOBJ = $(addprefix $(OBJDIR), $(EXECOBJA))
+EXECOBJA = $(addprefix $(OBJDIR), $(EXEC))
+
+EXECOBJ = $(addsuffix .o, $(EXECOBJA))
 
 OBJS = $(addprefix $(OBJDIR), $(OBJ))
 
 DEPS = $(wildcard src/*.h) Makefile include/lib739kv.h
 
-all: obj  $(SLIB) $(EXEC)
+TESTFILES = test.db
 
-$(EXEC): $(EXECOBJ) $(SLIB)
-	$(CPP) $(COMMON) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(SLIB)
+all: obj $(SLIB) $(EXECOBJ) $(EXEC)
 
 $(SLIB): $(OBJS)
 	$(CPP) $(CFLAGS) -shared $^ -o $@ $(LDFLAGS)
@@ -62,6 +64,9 @@ $(OBJDIR)%.o: %.cpp $(DEPS)
 
 $(OBJDIR)%.o: %.c $(DEPS)
 	$(CC) $(COMMON) $(CFLAGS) -c $< -o $@
+	
+$(EXEC): $(EXECOBJ) $(SLIB)
+	$(CPP) $(COMMON) $(CFLAGS) $(OBJDIR)$@.o -o $@ $(LDFLAGS) $(SLIB)
 
 obj:
 	mkdir -p obj
@@ -69,4 +74,4 @@ obj:
 .PHONY: clean
 
 clean:
-	rm -rf $(OBJS) $(SLIB) $(EXEC) $(EXECOBJ) $(OBJDIR) test.db
+	rm -rf $(OBJS) $(SLIB) $(EXEC) $(EXECOBJ) $(OBJDIR) $(EXEC) $(TESTFILES)

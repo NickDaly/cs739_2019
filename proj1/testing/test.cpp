@@ -78,7 +78,7 @@ void test_kv_store() {
 
 void test_message() {
 	DEBUG_PRINT("test_message() [begin]");
-	message msg;
+	message msg(command::OK);
 	char v[] = {'a', 'b', 'c', 'd', 'e', 'f'};
 	
 	msg.set_key("foo");

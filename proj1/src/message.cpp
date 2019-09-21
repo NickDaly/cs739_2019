@@ -5,7 +5,7 @@
 #define MAX_KEY_SIZE   128
 #define MAX_VALUE_SIZE 2048
 
-message::message() {
+message::message(command cmd) {
 	header_.id = 0;
 }
 

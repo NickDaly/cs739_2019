@@ -6,8 +6,7 @@
 
 int kv739_init(char ** server_list) {
 	std::cout << "kv739_init" << std::endl;	
-	server s(123);
-	s.serve();
+
 	return 0;
 }
 
