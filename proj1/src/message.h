@@ -9,6 +9,7 @@
 
 enum class command: int32_t
 {
+	NONE,
 	CHK,
 	OK,
     GET,
@@ -30,8 +31,11 @@ typedef struct header {
 class message {
 public:
 
+	message();
 	message(command cmd);
 	~message();
+
+	command get_command() const;
 	
 	int64_t get_param() const;
 	void set_param(int64_t param);

@@ -78,6 +78,7 @@ void test_kv_store() {
 
 void test_message() {
 	DEBUG_PRINT("test_message() [begin]");
+	DEBUG_PRINT("test_message() size=%d", sizeof(message));
 	message msg(command::OK);
 	char v[] = {'a', 'b', 'c', 'd', 'e', 'f'};
 	
@@ -99,6 +100,9 @@ void test_message() {
 }
 
 
+
+
+
 int main() {
 	DEBUG_PRINT("main() [begin]");
 	
@@ -111,5 +115,8 @@ int main() {
 	test_message();
 
 	DEBUG_PRINT("main() [end]");
+
+
+
 	return 0;
 }
