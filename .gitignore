@@ -32,3 +32,10 @@
 *.exe
 *.out
 *.app
+
+# SQL DB files
+*.log
+*.db
+
+# test
+test
