@@ -99,6 +99,9 @@ void test_message() {
 }
 
 
+
+
+
 int main() {
 	DEBUG_PRINT("main() [begin]");
 	
@@ -111,5 +114,8 @@ int main() {
 	test_message();
 
 	DEBUG_PRINT("main() [end]");
+
+
+
 	return 0;
 }
