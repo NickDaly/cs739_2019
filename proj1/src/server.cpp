@@ -21,15 +21,10 @@ server::~server() {
 
 
 void server::serve() {
-
- 	int sockfd;
- 	int newsockfd;
-
     struct sockaddr_in serv_addr; 
-    struct sockaddr_in cli_addr;
- 	
- 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) { 
+ 
+ 	sockfd_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd_ < 0) { 
         throw exception("server::serve() Error opening socket", errno);
     }
 
@@ -38,34 +33,54 @@ void server::serve() {
     serv_addr.sin_addr.s_addr = INADDR_ANY;
     serv_addr.sin_port = htons(port_);
 
-    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr))!=0 ) {
+    if (bind(sockfd_, (struct sockaddr *) &serv_addr, sizeof(serv_addr))!=0 ) {
     	throw exception("server::serve() Error binding socket to port", errno);
 	}
     
-    if (listen(sockfd, 5)!=0) {
+    if (listen(sockfd_, 5)!=0) {
     	throw exception("server::serve() Error binding socket to port", errno);
     }
 
-    socklen_t clilen = sizeof(cli_addr);
-    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0) {
-    	throw exception("server::serve() Error accepting connection", errno);
-    }
+	running_ = true;
+ 	listening_thread_ = new std::thread(&server::connection_handler, this);
+ 	processing_thread_ = new std::thread(&server::message_handler, this);
 
-     //      error("ERROR on accept");
-     // bzero(buffer,256);
-     // n = read(newsockfd,buffer,255);
-     // if (n < 0) error("ERROR reading from socket");
-     // printf("Here is the message: %s\n",buffer);
-     // n = write(newsockfd,"I got your message",18);
-     // if (n < 0) error("ERROR writing to socket");
-     // return 0; 
+}
+
+
+void server::connection_handler() {
+	int newsockfd;
+	struct sockaddr_in cli_addr;
+    while (running_) {
+    	socklen_t clilen = sizeof(cli_addr);
+    	newsockfd = accept(sockfd_, (struct sockaddr *) &cli_addr, &clilen);
+    	if (newsockfd < 0) {
+    		throw exception("server::serve() Error accepting connection", errno);
+    	}
+    	conns_.enqueue(newsockfd);
+	}
+}
+
+
+void server::message_handler() {
+	while (running_) {
+		int sockfd;
+		if (conns_.dequeue_wait(sockfd)) {
+			// bzero(buffer,256);
+     		// n = read(newsockfd,buffer,255);
+     		// if (n < 0) error("ERROR reading from socket");
+     		// printf("Here is the message: %s\n",buffer);
+     		// n = write(newsockfd,"I got your message",18);
+     		// if (n < 0) error("ERROR writing to socket");
+     		// return 0; 
+		}
+	}
 }
 
 
 void server::shutdown() {
-
-
+	running_ = false;
+	conns_.clear();
 }
 
 
