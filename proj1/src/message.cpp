@@ -5,8 +5,14 @@
 #define MAX_KEY_SIZE   128
 #define MAX_VALUE_SIZE 2048
 
+message::message() {
+	header_.id = 0;
+	header_.cmd = command::NONE;
+}
+
 message::message(command cmd) {
 	header_.id = 0;
+	header_.cmd = cmd;
 }
 
 
@@ -14,6 +20,9 @@ message::~message() {
 
 }
 
+command message::get_command() const {
+	return header_.cmd;
+}
 
 int64_t message::get_param() const  {
 	return header_.param;

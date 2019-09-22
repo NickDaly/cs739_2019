@@ -1,8 +1,13 @@
 #include <sys/types.h> 
+#include <sys/uio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <strings.h>
 #include "server.h"
+#include "message.h"
 #include "exception.h"
 
 server::server(const std::string &host, int port) {
@@ -64,17 +69,53 @@ void server::connection_handler() {
 
 
 void server::message_handler() {
+
 	while (running_) {
+
 		int sockfd;
+
 		if (conns_.dequeue_wait(sockfd)) {
-			// bzero(buffer,256);
-     		// n = read(newsockfd,buffer,255);
-     		// if (n < 0) error("ERROR reading from socket");
-     		// printf("Here is the message: %s\n",buffer);
-     		// n = write(newsockfd,"I got your message",18);
-     		// if (n < 0) error("ERROR writing to socket");
-     		// return 0; 
+
+			message msg;
+			int n = read(sockfd, (char *) &msg, sizeof(msg));
+			if (n < 0) {
+				DEBUG_PRINT("server::message_handler() Error reading message");
+			}
+
+			switch (msg.get_command()) {
+				case command::NONE:
+
+					break;
+					
+				case command::CHK:
+
+					break;
+
+				case command::OK:
+
+					break;
+
+    			case command::GET:
+
+					break;
+
+    			case command::PUT:
+
+					break;
+
+    			case command::ERROR:
+
+					break;
+
+    			case command::SHUT_DOWN:
+    				shutdown();
+					break;
+
+				default:
+					break;
+			}
 		}
+
 	}
 }
 
