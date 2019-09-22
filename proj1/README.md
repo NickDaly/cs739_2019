@@ -38,7 +38,9 @@ The server communication protocol is a simple, one-sided, and dumb (SOSAD) proto
      - B: 11 @ 2
      - C: RL @ 6
 
-All messages are assumed to be complete and irrelevant: messages sent but never received or processed should have no effect on the system's state.
+All messages are assumed to be complete and irrelevant: messages sent but never received or processed should have no detrimental effect on the system's state.  The local server should update the remote server's state based on the most recent message timestamp received from the remote server. E.g., if C received a message from A at time 5, but none of A's keys were newer than time 2, C would update A's most recent time to 2.
+
+During syncs, servers are assumed to sync all keys as at least as recent as the remote server's state.  If C thinks A is at time 2, then it'll send A all keys with a timestamp of 2 or later.
 
 ### Sample Communication
 
@@ -68,6 +70,8 @@ B receives updates from the client:
 - B: waffle = yoda
 - B: grace = jack
 
+After this step's updates are applied, the servers look like this:
+
 | Time | Server | Key      | Value |
 |------|--------|----------|-------|
 | 2    | A      | B-now    | 1     |
@@ -93,6 +97,10 @@ B sends those updates to other servers, while C receives new updates:
 - B -> A, C: grace@2
 - C: frogger = munchkin
 
+Unfortunately, A did not receive the update.
+
+After this step's updates are applied, the servers look like this:
+
 | Time | Server | Key       | Value    |
 |------|--------|-----------|----------|
 | 3    | A      | B-now     | 1        |
@@ -115,10 +123,12 @@ B sends those updates to other servers, while C receives new updates:
 
 T=4:
 
-C syncs that update, but uh oh, A didn't receive the updates!  That's all right, we'll fix that shortly.  C also received another update, too.
+C syncs that update, but uh oh, A didn't receive the previous updates!  That's all right, we'll fix that shortly.  C also received another update, too.
 
 - C -> A, B: frogger@3
 - C: tom = turkey
+
+After this step's updates are applied, the servers look like this:
 
 | Time | Server | Key       | Value    |
 |------|--------|-----------|----------|
@@ -145,71 +155,48 @@ C syncs that update, but uh oh, A didn't receive the updates!  That's all right,
 
 T=5:
 
-Now, at T=5, all the servers sync keys they've received since the previous message:
+Now, at T=5, all the servers sync keys they've received that are as new or newer than the remote server's state:
 
 - A -> B, C: frogger@3
 - B -> A: waffle@2, grace@2
 - C -> A, B: frogger@3, tom@4
 
+After this step's updates are applied, the servers look like this:
+
 | Time | Server | Key       | Value    |
 |------|--------|-----------|----------|
-| 5    | A      | B-now     | 1        |
+| 5    | A      | B-now     | 2        |
 | 5    | A      | B-prev    | 1        |
-| 5    | A      | C-now     | 3        |
+| 5    | A      | C-now     | 4        |
 | 5    | A      | C-prev    | 1        |
 | 5    | A      | frogger:3 | munchkin |
-| 5    | B      | A-now     | 1        |
+| 5    | A      | waffle:2  | yoda     |
+| 5    | A      | grace:2   | jack     |
+| 5    | A      | tom:4     | turkey   |
+| 5    | B      | A-now     | 3        |
 | 5    | B      | A-prev    | 1        |
-| 5    | B      | C-now     | 3        |
+| 5    | B      | C-now     | 4        |
 | 5    | B      | C-prev    | 1        |
+| 5    | B      | tom:4     | turkey   |
 | 5    | B      | waffle:2  | yoda     |
 | 5    | B      | grace:2   | jack     |
 | 5    | B      | frogger:3 | munchkin |
 | 5    | C      | B-now     | 2        |
 | 5    | C      | B-prev    | 1        |
-| 5    | C      | A-now     | 1        |
+| 5    | C      | A-now     | 3        |
 | 5    | C      | A-prev    | 1        |
 | 5    | C      | frogger:3 | munchkin |
 | 5    | C      | waffle:2  | yoda     |
 | 5    | C      | grace:2   | jack     |
 | 5    | C      | tom:4     | turkey   |
 
-T=6:
-
-Since we only sent new keys, we were able to send slightly smaller update messages.  This works only because the full-sync messages are assumed to be complete.
-
-| Time | Server | Key       | Value    |
-|------|--------|-----------|----------|
-| 6    | A      | B-now     | 5        |
-| 6    | A      | B-prev    | 1        |
-| 6    | A      | C-now     | 5        |
-| 6    | A      | C-prev    | 3        |
-| 6    | A      | frogger:3 | munchkin |
-| 6    | A      | waffle:2  | yoda     |
-| 6    | A      | grace:2   | jack     |
-| 6    | A      | tom:4     | turkey   |
-| 6    | B      | A-now     | 5        |
-| 6    | B      | A-prev    | 1        |
-| 6    | B      | C-now     | 5        |
-| 6    | B      | C-prev    | 3        |
-| 6    | B      | waffle:2  | yoda     |
-| 6    | B      | grace:2   | jack     |
-| 6    | B      | frogger:3 | munchkin |
-| 6    | B      | tom:4     | turkey   |
-| 6    | C      | B-now     | 5        |
-| 6    | C      | B-prev    | 2        |
-| 6    | C      | A-now     | 5        |
-| 6    | C      | A-prev    | 1        |
-| 6    | C      | frogger:3 | munchkin |
-| 6    | C      | waffle:2  | yoda     |
-| 6    | C      | grace:2   | jack     |
-| 6    | C      | tom:4     | turkey   |
-
 ### Possible Optimizations
 
 1. Suppress timestamps in update messages and use only the most recent timestamp (or the average timestamp) as the keys' changed times.
 2. Make smaller update messages by storing each other server and version with each key.  That way we can send exactly the keys the other server needs to catch up, but is somewhat more complex to implement and takes more memory per key to store.
 3. Send full-sync messages on a rolling basis, sending them at different times per server.
+
+#2 is probably the most important improvement for reliability if message delivery is not guaranteed.
 
 ## Desirable Properties
 
