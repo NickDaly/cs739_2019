@@ -1,7 +1,17 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include <sys/types.h> 
+#include <sys/uio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
 #include <string>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
+
 #include "queue.h"
 #include "debug.h"
 
@@ -13,7 +23,7 @@ public:
 	void serve();
 	void connection_handler();
 	void message_handler();
-	void shutdown();
+	void stop();
 	
 private:
 	int port_;
