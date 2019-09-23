@@ -32,6 +32,7 @@ void client::send_message(const message &msg, message &response) {
 		throw exception("client::send_message() Error connecting to end point", errno);
 	}
 
+	DEBUG_PRINT("client::send_message() send...");
 	send(sock_, (void *) &msg, sizeof(message), 0);
 
 	// get a response from the server
@@ -40,6 +41,7 @@ void client::send_message(const message &msg, message &response) {
 	if (n<len) {
 		throw exception("client::send_message() Invalid response size", errno);
 	}
+
 
 	close(sock_);
 	sock_ = 0;

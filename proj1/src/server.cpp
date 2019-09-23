@@ -99,28 +99,44 @@ void server::message_handler() {
 
 					break;
 					
-				case command::CHK:
+				case command::CHK: {
+						DEBUG_PRINT("server::message_handler(): key=%s", msg.key());
+						message m(command::OK);
+						send(sockfd, (void *) &m, sizeof(message), 0);
+					}
+					break;
+
+				case command::OK: {						
+						send(sockfd, (void *) &msg, sizeof(msg), 0);
+					}
+					break;
+
+    			case command::GET: {
+    					std::string v(msg.value(), msg.value() + msg.get_value_size());
+						DEBUG_PRINT("server::message_handler(): GET: key=%s, value=%s", msg.key(), v.c_str());
+						message m(command::OK);
+						send(sockfd, (void *) &m, sizeof(message), 0);
+					}
 
 					break;
 
-				case command::OK:
+    			case command::PUT: {
+    					std::string v(msg.value(), msg.value() + msg.get_value_size());
+						DEBUG_PRINT("server::message_handler(): PUT: key=%s, value=%s", msg.key(), v.c_str());
+						message m(command::OK);
+						send(sockfd, (void *) &m, sizeof(message), 0);
+					}
 
 					break;
 
-    			case command::GET:
+    			case command::ERROR: {
 
+	    			}
 					break;
 
-    			case command::PUT:
-
-					break;
-
-    			case command::ERROR:
-
-					break;
-
-    			case command::SHUT_DOWN:
-    				stop();
+    			case command::SHUT_DOWN: {
+    					stop();
+    				}
 					break;
 
 				default:
@@ -176,12 +192,6 @@ void server::stop() {
 
 
 
-
-
-
-
-
-// #include <iostream> 
 // #include <sys/ipc.h> 
 // #include <sys/shm.h> 
 // #include <stdio.h> 

@@ -43,7 +43,7 @@ OBJ=sqlite3.o \
 	lib739kv.o \
 
 #list of executable to build  
-EXEC = test test_server
+EXEC = test test_server test_client
 
 EXECOBJA = $(addprefix $(OBJDIR), $(EXEC))
 
