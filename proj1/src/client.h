@@ -2,6 +2,7 @@
 #define CLIENT_H
 
 #include <string>
+#include <vector>
 #include <string.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
