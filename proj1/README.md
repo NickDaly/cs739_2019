@@ -24,7 +24,7 @@ Each daemon holds a distributed KV store. Daemon processors are identical except
 
 
 ## IPC
-For the time being we use TCP/IP (might not be the most efficient, but simple enough to implement) for our IPC. The communication consist of a request message and a response message. A client making a request will always get a response. If client don't receive response within certain time limit, one can assume the server is crashed or in an error state. The format of the message as following:
+For the time being we use TCP/IP (might not be the most efficient, but simple enough to implement) for our IPC. We use a messaging based communication. The communication consist of a request [message](https://github.com/sekcheong/cs739_2019/blob/master/proj1/src/message.h) and a response message. A client making a request will always get a response. If client don't receive response within certain time limit, one can assume the server is crashed or in an error state. The format of the message as following:
 
     +-------------+
     | heder       |
