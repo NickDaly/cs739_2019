@@ -23,6 +23,11 @@ Each daemon holds a distributed KV store. Daemon processors are identical except
 ### Need to have ability to monitor daemon across servers?
 
 
+##IPC
+For the time being we use TCP/IP (might not be the most efficient, but simple enough to implement) for our IPC. 
+    +-------------+
+    | heder       |
+    +-------------+
 ## Backend Data Store
 We use SQLite3 as our backend store. We create one DB file per server and there is only one table in the DB data_store (key TEXT PRIMARY KEY, value BLOB, timestamp INTEGER)
 
