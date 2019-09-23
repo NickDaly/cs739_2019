@@ -292,3 +292,8 @@ Find the latest copy among the servers send it to the requester, all other clien
 8. Misordered request tests.
 9. Mistimed request tests.
 10. Kill the load balancer.
+
+
+# Questions
+1. From kv739_init it the caller will provide a list of host:port, if the hosts are remote how do we create servers on remote host?
+2. 
