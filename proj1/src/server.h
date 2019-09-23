@@ -12,13 +12,14 @@
 #include <stdlib.h>
 #include <strings.h>
 
-#include "queue.h"
 #include "debug.h"
+#include "queue.h"
+#include "datastore.h"
 
 class server {
 
 public:
-	server(const std::string &host, int port);
+	server(const std::string &host, int port, const std::string &db_file);
 	virtual ~server();
 	void serve();
 	void connection_handler();
@@ -28,10 +29,11 @@ public:
 private:
 	int port_;
 	std::string host_;
+	std::string db_file_;
 	int sockfd_;
 	queue<int> conns_;
-	bool running_;
-	// bool waiting_;
+	bool running_;	
+	data_store *ds_ = nullptr;
 	std::thread* listening_thread_ = nullptr;
 	std::thread* processing_thread_ = nullptr;
 };

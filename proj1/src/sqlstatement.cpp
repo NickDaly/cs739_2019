@@ -13,18 +13,18 @@ sql_statement::~sql_statement() {
 }
 
 
-void sql_statement::prepare(const std::string &sql) {
-	auto ret = sqlite3_prepare_v2(db_, sql.c_str(), -1, &stmt_, 0);
+void sql_statement::prepare(const char* sql) {
+	auto ret = sqlite3_prepare_v2(db_, sql, -1, &stmt_, 0);
 	if (ret != SQLITE_OK) {
-		throw exception("sql_statement::prepare(): Faild to prepare statement ':" + sql + "' Error:" + std::string(sqlite3_errmsg(db_)), ret);
+		throw exception("sql_statement::prepare(): Faild to prepare statement ':" + std::string(sql) + "' Error:" + std::string(sqlite3_errmsg(db_)), ret);
 	}
 }
 
 
-void sql_statement::execute(const std::string &sql) {	 	
-	auto ret = sqlite3_exec(db_, sql.c_str(), 0, 0, 0);
+void sql_statement::execute(const char* sql) {	 	
+	auto ret = sqlite3_exec(db_, sql, 0, 0, 0);
 	if (ret!=SQLITE_OK) {
-		throw exception("sql_statement::execute(): Faild to execute statement ':" + sql + "' Error:" + std::string(sqlite3_errmsg(db_)), ret);
+		throw exception("sql_statement::execute(): Faild to execute statement ':" + std::string(sql) + "' Error:" + std::string(sqlite3_errmsg(db_)), ret);
 	}
 }
 
@@ -37,8 +37,8 @@ void sql_statement::execute() {
 }
 
 
-void sql_statement::bind_text(int pos, const std::string &txt) {
-	auto ret = sqlite3_bind_text(stmt_, pos, txt.c_str(), -1, 0);
+void sql_statement::bind_text(int pos, const char *txt) {
+	auto ret = sqlite3_bind_text(stmt_, pos, txt, -1, 0);
 	if (ret != SQLITE_OK) {
 		throw exception("sql_statement::bind_text(): " + std::string(sqlite3_errmsg(db_)), ret);
 	}
@@ -90,6 +90,7 @@ int sql_statement::read_blob(int col, const char *buffer, int length) {
 	else {
  	 	char *src = (char*) sqlite3_column_blob(stmt_, col);
  	 	memcpy((void*)buffer, (void*)src, length);
+ 	 	return length;
 	}
 	return 0;
 }

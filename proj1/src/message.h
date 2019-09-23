@@ -25,6 +25,7 @@ typedef struct header {
 	int64_t param;
 	int32_t key_size;
 	int32_t value_size;
+	int64_t value_timestamp;
 } header_t;
 
 
@@ -45,7 +46,9 @@ public:
 	
 	int  get_value_size() const;
 	void set_value(const char* value, int len);
-
+	void set_value_timestamp(int64_t ts);
+	void get_value_timestamp();
+	
 	//returns the pointer to the key string
 	const char *key();
 	

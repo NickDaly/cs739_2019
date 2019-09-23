@@ -13,25 +13,26 @@ int64_t get_timestamp() {
 
 
 data_store::data_store() {
-	
+
 }
 
 
-data_store::data_store(const std::string &filename) {
+data_store::data_store(const char *filename) {
 	DEBUG_PRINT("data_store::data_store() [begin]");
 	//file:/home/fred/data.db
-	DEBUG_PRINT("  Creating db connection to '%s'...", filename.c_str());
-	filename_ = filename;
+	DEBUG_PRINT("  Creating db connection to '%s'...", filename);
+
+	filename_ = std::string(filename);
 	
-	auto ret = sqlite3_open(filename.c_str(), &db_);
+	auto ret = sqlite3_open(filename, &db_);
 	
 	if (ret!=SQLITE_OK) {
-		throw exception("Unable to open database: " + filename, ret);
+		throw exception("Unable to open database: " + filename_, ret);
 	}
 
-	std::string sql = "CREATE TABLE IF NOT EXISTS data_store (key TEXT PRIMARY KEY, value BLOB, timestamp INTEGER);";
+	const char *sql = "CREATE TABLE IF NOT EXISTS data_store (key TEXT PRIMARY KEY, value BLOB, timestamp INTEGER);";
  	
- 	ret = sqlite3_exec(db_, sql.c_str(), 0, 0, 0);
+ 	ret = sqlite3_exec(db_, sql, 0, 0, 0);
  	if (ret!=SQLITE_OK) {
  		throw exception("Error creating the date_store table", ret);
  	}
@@ -52,31 +53,39 @@ data_store::~data_store() {
 }
 
 
-bool data_store::get(std::string &key, std::vector<char> &value, int64_t &timestamp) {
-	
+bool data_store::get(const char *key, const char *value, int *len, int64_t *timestamp) {
+
 	if (!validate_key(key)) {
 		throw exception("sdata_store::get(): Invalid key", -1);
 	}
 
+	if (timestamp) { 
+		*timestamp = 0;
+	}
+
 	sql_statement stmt(db_);
-	std::string sql = "SELECT key, value, timestamp from data_store WHERE key = ?";
+	const char* sql = "SELECT key, value, timestamp from data_store WHERE key = ?";
 
 	stmt.prepare(sql);
+
 	stmt.bind_text(1, key);
 
-	if (stmt.read()) {		
-		
-		auto k = stmt.read_text(0);
+	if (stmt.read()) {
 
+	 	auto k = stmt.read_text(0);
+	
 		//get the blob length
-		int len = stmt.read_blob(1, 0, 0);
-		//make sure the vector is in the same length
-		value.resize(len);
-		//read the value
-		len = stmt.read_blob(1, value.data(), len);
+		int vlen = stmt.read_blob(1, 0, 0);
+		if (vlen > *len) {
+			throw exception("data_store::get(): Insufficient buffer size", -1);	
+		}
+
+		*len = stmt.read_blob(1, value, vlen);
 
 		//return the timestamp		
-		timestamp = stmt.read_int64(2);
+		if (timestamp) {
+			*timestamp = stmt.read_int64(2);
+		}
 		
 		return true;
 	}
@@ -86,65 +95,61 @@ bool data_store::get(std::string &key, std::vector<char> &value, int64_t &timest
 }
 
 
-bool data_store::put(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {	
+bool data_store::put(const char *key, const char *value, int len, const char *ov, int *ov_len, int64_t *timestamp) {	
 
-	if (!validate_key(key)) {
-		throw exception("sdata_store::put(): Invalid key", -1);
-	}
+	// if (!validate_key(key)) {
+	// 	throw exception("sdata_store::put(): Invalid key", -1);
+	// }
 
-	if (!validate_value(newvalue)) {
-		throw exception("sdata_store::put(): Invalid value", -1);
-	}
+	// if (!validate_value(value, len)) {
+	// 	throw exception("sdata_store::put(): Invalid value", -1);
+	// }
 
-	sql_statement stmt(db_);
+	// timestamp = 0;
 
-	auto ts = get_timestamp();
+	// sql_statement stmt(db_);
+
+	// auto ts = get_timestamp();
 	
-	if (get(key, oldvalue, timestamp)) {
-		std::string sql = "UPDATE data_store SET value = ?, timestamp = ? WHERE key = ?";
-		stmt.prepare(sql);
-		stmt.bind_blob(1, newvalue.data(), newvalue.size());
-		stmt.bind_int64(2, ts);
-		stmt.bind_text(3, key);
-		stmt.execute();
-	}
-	else {
-		std::string sql = "INSERT INTO data_store VALUES(?, ?, ?)";
-		stmt.prepare(sql);
-		stmt.bind_text(1, key);
-		stmt.bind_blob(2, newvalue.data(), newvalue.size());
-		stmt.bind_int64(3, ts);
-		stmt.execute();
-	}
+	// if (get(key, oldvalue, timestamp)) {
+	// 	std::string sql = "UPDATE data_store SET value = ?, timestamp = ? WHERE key = ?";
+	// 	stmt.prepare(sql);
+	// 	stmt.bind_blob(1, newvalue.data(), newvalue.size());
+	// 	stmt.bind_int64(2, ts);
+	// 	stmt.bind_text(3, key);
+	// 	stmt.execute();
+	// }
+	// else {
+	// 	std::string sql = "INSERT INTO data_store VALUES(?, ?, ?)";
+	// 	stmt.prepare(sql);
+	// 	stmt.bind_text(1, key);
+	// 	stmt.bind_blob(2, newvalue.data(), newvalue.size());
+	// 	stmt.bind_int64(3, ts);
+	// 	stmt.execute();
+	// }
 
 	return true;
 }
 
 
-bool data_store::validate_key(const std::string &key) {
-
-	if (key.length()==0) return false;
-	
-	if (key.length()>MAX_KEY_LEN) {
-		return false;
-	}
-
-	for (auto c:key) {
+bool data_store::validate_key(const char *key) {
+	int len = strlen(key);
+	if (len==0 || len>MAX_KEY_LEN) return false;	
+	for (int i=0; i<len; i++) {
+		auto c = key[i];
 		if (!isprint(c)) return false;		
 		if (c=='[' || c==']') return false;			
-	}
-	
+	}	
 	return true;
 }
 
 
-bool data_store::validate_value(const std::vector<char> &data) {
+bool data_store::validate_value(const char *data, int len) {
 
-	if (data.size()>MAX_KEY_LEN) {
-		return false;
-	}
-
-	for (auto c:data) {
+	if (len>MAX_KEY_LEN) return false;
+	
+	for (int i=0; i<len; i++) {
+		auto c = data[i];
 		if (!isprint(c)) return false;
 		if (c=='[' || c==']') return false;	
 	}

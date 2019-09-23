@@ -2,13 +2,15 @@
 #include "message.h"
 #include "exception.h"
 
-server::server(const std::string &host, int port) {
+server::server(const std::string &host, int port, const std::string &db_file) {
 	DEBUG_PRINT("server::server() [begin]");
 	DEBUG_PRINT("server::server() host=%s, port=%d", host.c_str(), port);
 
 	port_ = port;
 	host_ = host;
-	
+	db_file_ = db_file;	
+	ds_ = new data_store(db_file.c_str());
+
 	DEBUG_PRINT("server::server() [end]");
 }
 
@@ -18,6 +20,12 @@ server::~server() {
 	if (running_) {
 		stop();
 	}
+
+	if (ds_) {
+		delete ds_;
+		ds_ = nullptr;
+	}
+
 	DEBUG_PRINT("server::~server() [end]");
 }
 
@@ -120,14 +128,24 @@ void server::message_handler() {
 
 					break;
 
-    			case command::PUT: {
-    					std::string v(msg.value(), msg.value() + msg.get_value_size());
-						DEBUG_PRINT("server::message_handler(): PUT: key=%s, value=%s", msg.key(), v.c_str());
-						message m(command::OK);
-						send(sockfd, (void *) &m, sizeof(message), 0);
-					}
+    			case command::PUT:
+	    			break;
+    	// 		case command::PUT: {
+					// 	// std::vector<char> v(msg.value(), msg.value() + msg.get_value_size());
+					// 	// DEBUG_PRINT("server::message_handler(): PUT: key=%s, value=%s", msg.key(), vec2str(v).c_str());
+					// 	// try {
+					// 	// 	message m(command::OK);
+					// 	// 	std::vector<char> ov;
+					// 	// 	int64_t ts;
+					// 	// 	//ds_->put(msg.key(), v, ov, ts);
+					// 	// }
+					// 	// catch (exception &ex) {
+					// 	// 	message m(command::ERROR);
+					// 	// }
+					// 	// send(sockfd, (void *) &m, sizeof(message), 0);
+					// }
 
-					break;
+					// break;
 
     			case command::ERROR: {
 
@@ -165,30 +183,6 @@ void server::stop() {
 
 	DEBUG_PRINT("server::stop() [end]");	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

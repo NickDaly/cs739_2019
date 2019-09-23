@@ -5,7 +5,8 @@
 
 int main() {
 	std::string host = "localhost";
-	server s(host, 52123);
+	std::string dbfile = "test.db";
+	server s(host, 52123, dbfile);
 	s.serve();
 
 	while (1) {

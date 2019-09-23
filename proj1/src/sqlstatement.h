@@ -10,10 +10,10 @@ class sql_statement {
 public:
 	sql_statement(sqlite3 *db);	
 	virtual ~sql_statement();
-	void prepare(const std::string &stmt);
-	void execute(const std::string &stmt);
+	void prepare(const char *stmt);
+	void execute(const char *stmt);
 	void execute();
-	void bind_text(int pos, const std::string &txt);
+	void bind_text(int pos, const char *txt);
 	void bind_blob(int pos, const char *buffer, int length);
 	void bind_int64(int pos, int64_t value);
 	bool read();
