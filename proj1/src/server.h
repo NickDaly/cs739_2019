@@ -25,6 +25,7 @@ public:
 	void connection_handler();
 	void message_handler();
 	void stop();
+	bool is_running();
 	
 private:
 	int port_;

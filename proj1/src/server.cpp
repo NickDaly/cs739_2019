@@ -205,18 +205,9 @@ void server::stop() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+bool server::is_running() {
+	return running_;
+}
 
 
 // #include <sys/ipc.h> 
