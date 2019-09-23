@@ -31,8 +31,27 @@ For the time being we use TCP/IP (might not be the most efficient, but simple en
     +-------------+
     | payload     |
     +-------------+
-
-
+   
+       
+     64-bit
+    +-----------------------------------------------+
+    | id                                            |
+    +-----------------------+-----------------------+
+    | command               | flag                  |
+    +-----------------------+-----------------------+
+    | param                                         |
+    +-----------------------+-----------------------+
+    | key size              | value size            |
+    +-----------------------+-----------------------+
+    | value time stamp                              |
+    +-----------------------------------------------+
+    |                                               |
+    .                                               .
+    .   payload                                     .
+    .                                               .  
+    |                                               |
+    +-----------------------------------------------+
+   
 The message is fixed in 4096 byte and it is composed of a header block and a payload block.
 
 ## Backend Data Store
