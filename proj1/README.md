@@ -6,7 +6,7 @@ CS737 Distributed Systems Fall 2019
 
 These are components we do or may need:
 
-1. Daemon (Sek)
+1. Daemon (Sek) :white_check_mark:
 2. IPC (Sek) :white_check_mark:
 3. Backend data store (Sek) :white_check_mark:
 4. Server-to-server communication protocol (Nick)
