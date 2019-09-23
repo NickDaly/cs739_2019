@@ -13,6 +13,14 @@ These are components we do or may need:
 5. Load balancer / gateway
 6. Monitoring / failure recovery system
 
+## Daemon
+The daemon process is the service for the distributed KV store. Each daemon process is identical except the database file they use for storing data. The daemon can create a number of daemon processors for each port, file combination, say D[port, file]. One of the daemon needs to be the leader that responsible for:
+
+1. Making sure the keys are replicated among the other daemons (this ensures eventual consistancy)
+2. Monitor other daemons and replace one if one fails
+3. If the master daemon dies, the peer should elect a master daemon take over its job 
+4. If a request key doesn't exit from a specific daemon, that daemon should be able to ask the master to see who can has the key. The requestor upon receive the value should populate its own store. The requesting daemon need can simply tell the client key doesn't exist while try to find the key from other daemon and update it in a low priority job. 
+
 ## Backend Data Store
 
 ## Server Communication Protocol: SOSAD
