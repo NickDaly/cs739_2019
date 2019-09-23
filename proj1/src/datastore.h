@@ -19,9 +19,6 @@ using value_p = std::shared_ptr<std::vector<char>>;
 int64_t get_timestamp();
 
 
-
-
-
 class data_store {
 public:
 	data_store();
@@ -34,20 +31,21 @@ public:
 	virtual bool validate_key(const char* key);
 	virtual bool validate_value(const char *value, int len);
 
-
 	virtual bool get(const char *key, const char *value, int *len) {
-		return get(key, value, len, 0);
+		int64_t ts;
+		return get(key, value, len, &ts);
 	}
-	
 
 	virtual bool put(const char *key, const char *value, int len) {
-		return	put(key, value, len, 0, 0, 0);
+		char ov[MAX_VALUE_LEN];
+		int ov_len = sizeof(ov);
+		int64_t ts;
+		return put(key, value, len, ov, &ov_len, &ts);
 	}
-
 
 	virtual bool put(const char *key, const char *value) {
 		int len = strlen(value);
-		return	put(key, value, len, 0, 0, 0);
+		return put(key, value, len);
 	}
 
 	// virtual bool get(const char *key, std::vector<char> &value, int64_t &timestamp) {

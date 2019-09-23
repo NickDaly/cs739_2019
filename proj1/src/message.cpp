@@ -5,23 +5,33 @@
 #define MAX_KEY_SIZE   128
 #define MAX_VALUE_SIZE 2048
 
+
 message::message() {
 	header_.id = 0;
 	header_.cmd = command::NONE;
 }
+
 
 message::message(command cmd) {
 	header_.id = 0;
 	header_.cmd = cmd;
 }
 
+
 message::~message() {
 
 }
 
+
 command message::get_command() const {
 	return header_.cmd;
 }
+
+
+void message::set_command(command cmd) {
+	header_.cmd = cmd;
+}
+
 
 int64_t message::get_param() const  {
 	return header_.param;
@@ -53,6 +63,22 @@ int message::get_value_size() const {
 }
 
 
+std::string message::get_value_string() {
+	std::string v(value(), value() + get_value_size());
+	return v;
+}
+
+
+void message::set_value_timestamp(int64_t ts) {
+	header_.value_timestamp = ts;
+}
+
+
+int64_t message::get_value_timestamp() {
+	return header_.value_timestamp;
+}
+
+
 void message::set_key(const char* key) {
 	auto len = strlen(key);	
 	assert(len>0 && len<=MAX_KEY_SIZE);
@@ -63,9 +89,16 @@ void message::set_key(const char* key) {
 
 
 void message::set_value(const char* val, int len) {
-	assert(len>=0 && len<MAX_VALUE_SIZE );
 	set_value_size(len);
-	memcpy((void*) value(), (void*) val, len);
+	if (len>0) {
+		memcpy((void*) value(), (void*) val, len);
+	}
+}
+
+
+void message::clear() {
+	memset (&header_, 0 , sizeof(header_t));
+	memset ((void*) payload, 0 , sizeof(payload));
 }
 
 

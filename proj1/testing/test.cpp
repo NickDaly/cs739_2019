@@ -26,46 +26,81 @@ void test_kv_store() {
 	DEBUG_PRINT("  SQLite3 Version: %s\n", sqlite3_libversion()); 
 	
 	data_store ds("test.db");
-	
+
 	try {
-		ds.put("foo", "Hello World!");
+		int64_t ts;			
+		char ov[2048];
+		int ov_len = sizeof(ov);	
+
+		const char *key = "foo";
+		const char *nv = "What's up doc?";
+		
+		ds.put("foo", nv, strlen(nv), ov, &ov_len, &ts);
+		std::cout << "key      : " << key << std::endl;
+
+		//if we have an old value
+		if (ov_len>-1) {
+			ov[ov_len] = 0;
+			std::cout << "old value: " << ov << std::endl;
+			std::cout << "time     : " << ts << std::endl;
+		}
 	}
 	catch (exception &ex) {
 		std::cerr << ex.what()  << " error_code: " << ex.code() << std::endl;
 	}
 
+	
+	try {
+		ds.put("foo", "Hello World!");
+		ds.put("foo", "Goodbye!");
+	}
+	catch (exception &ex) {
+		std::cerr << ex.what()  << " error_code: " << ex.code() << std::endl;
+	}
 
-	// try {
-	// 	int64_t ts;		
-	// 	std::string key = "foo";
-	// 	std::vector<char> value;		
-	// 	ds.get(key, value, ts);				
-	// 	std::string str(value.begin(), value.end());
-	// 	std::cout << "key  : " << key << std::endl;
-	// 	std::cout << "value: " << str << std::endl;
-	// 	std::cout << "time : " << ts << std::endl;		
-	// }
-	// catch (exception &ex) {
-	// 	std::cerr << ex.what()  << " error_code: " << ex.code() << std::endl;
-	// }
+	try {
+		int64_t ts;			
+		char buff[2048];
+		int len = sizeof(buff);	
+		const char *key = "foo";
 
-	// try {
-	// 	int64_t ts;		
-	// 	std::string key = "foo";
-	// 	std::vector<char> value;		
-	// 	if (ds.get(key, value, ts)) {	
-	// 		std::string str(value.begin(), value.end());
-	// 		std::cout << "key  : " << key << std::endl;
-	// 		std::cout << "value: " << str << std::endl;
-	// 		std::cout << "time : " << ts << std::endl;		
-	// 	}
-	// 	else {
-	// 		std::cout << "'" << key  << "'" << " doesn't exist!" << std::endl;
-	// 	}
-	// }
-	// catch (exception &ex) {
-	// 	std::cerr << ex.what()  << " error_code: " << ex.code() << std::endl;
-	// }
+		std::cout << "key      : " << key << std::endl;
+		if (ds.get(key, buff, &len, &ts)) {
+			buff[len]=0;
+			std::cout << "value    : " << buff << std::endl;
+			std::cout << "time     : " << ts << std::endl;	
+		}
+		else {
+			std::cout << "Key doesn't exist!" << std::endl;
+		}
+
+	}
+	catch (exception &ex) {
+		std::cerr << ex.what()  << " error_code: " << ex.code() << std::endl;
+	}
+
+	try {
+		int64_t ts;			
+		char ov[2048];
+		int ov_len = sizeof(ov);	
+
+		const char *key = "foo";
+		const char *nv = "What's up doc?";
+		
+		ds.put("foo", nv, strlen(nv), ov, &ov_len, &ts);
+		std::cout << "key      : " << key << std::endl;
+
+		//if we have an old value
+		if (ov_len>-1) {
+			ov[ov_len] = 0;
+			std::cout << "old value: " << ov << std::endl;
+			std::cout << "time     : " << ts << std::endl;
+		}
+	}
+	catch (exception &ex) {
+		std::cerr << ex.what()  << " error_code: " << ex.code() << std::endl;
+	}
+
 }
 
 

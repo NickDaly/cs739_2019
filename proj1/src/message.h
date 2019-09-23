@@ -4,16 +4,18 @@
 #include <chrono>
 #include <cstdint>
 #include <cctype>
+#include <string>
 
 #define MSG_SIZE 4096
 
 enum class command: int32_t
 {
-	NONE,
+	NONE = 0,
 	CHK,
 	OK,
     GET,
     PUT,
+    NO_VAL,
     ERROR,
     SHUT_DOWN
 };
@@ -36,6 +38,7 @@ public:
 	message(command cmd);
 	~message();
 
+	void set_command(command cmd);
 	command get_command() const;
 	
 	int64_t get_param() const;
@@ -46,14 +49,17 @@ public:
 	
 	int  get_value_size() const;
 	void set_value(const char* value, int len);
+	std::string get_value_string();
 	void set_value_timestamp(int64_t ts);
-	void get_value_timestamp();
+	int64_t get_value_timestamp();
 	
 	//returns the pointer to the key string
 	const char *key();
 	
 	//returns the pointers to the value
 	const char *value();
+
+	void clear();
 
 private:
 	void set_key_size(int len);

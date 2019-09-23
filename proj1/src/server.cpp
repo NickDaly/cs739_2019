@@ -94,7 +94,12 @@ void server::message_handler() {
 			
 			if (!running_) break;
 			
+			char buff[MAX_VALUE_LEN];
+			int buff_len = sizeof(buff);	
+			int64_t ts;
+
 			message msg;
+
 			int len = sizeof(msg);
 			int n = recv(sockfd, (void *) &msg, len, MSG_WAITALL);
 
@@ -103,14 +108,12 @@ void server::message_handler() {
 			}
 
 			switch (msg.get_command()) {
-				case command::NONE:
-
-					break;
 					
 				case command::CHK: {
 						DEBUG_PRINT("server::message_handler(): key=%s", msg.key());
-						message m(command::OK);
-						send(sockfd, (void *) &m, sizeof(message), 0);
+						msg.clear();
+						msg.set_command(command::OK);
+						send(sockfd, (void *) &msg, sizeof(message), 0);
 					}
 					break;
 
@@ -120,44 +123,61 @@ void server::message_handler() {
 					break;
 
     			case command::GET: {
-    					std::string v(msg.value(), msg.value() + msg.get_value_size());
-						DEBUG_PRINT("server::message_handler(): GET: key=%s, value=%s", msg.key(), v.c_str());
-						message m(command::OK);
-						send(sockfd, (void *) &m, sizeof(message), 0);
+    					msg.clear();
+						DEBUG_PRINT("server::message_handler(): GET: key=%s", msg.key());
+						try {
+							buff_len = sizeof(buff);
+							if (ds_->get(msg.key(), buff, &buff_len, &ts)) {
+								msg.set_value(buff, buff_len);
+								msg.set_value_timestamp(ts);
+							}
+							else {
+								msg.set_command(command::NO_VAL);
+							}
+						}
+						catch (exception &ex) {
+							msg.set_command(command::ERROR);
+							DEBUG_PRINT("server::message_handler(): GET: Error %s", ex.what());
+						}
+						send(sockfd, (void *) &msg, sizeof(message), 0);
 					}
 
 					break;
 
-    			case command::PUT:
-	    			break;
-    	// 		case command::PUT: {
-					// 	// std::vector<char> v(msg.value(), msg.value() + msg.get_value_size());
-					// 	// DEBUG_PRINT("server::message_handler(): PUT: key=%s, value=%s", msg.key(), vec2str(v).c_str());
-					// 	// try {
-					// 	// 	message m(command::OK);
-					// 	// 	std::vector<char> ov;
-					// 	// 	int64_t ts;
-					// 	// 	//ds_->put(msg.key(), v, ov, ts);
-					// 	// }
-					// 	// catch (exception &ex) {
-					// 	// 	message m(command::ERROR);
-					// 	// }
-					// 	// send(sockfd, (void *) &m, sizeof(message), 0);
-					// }
+    			case command::PUT: {
+    					msg.clear();
+						std::vector<char> v(msg.value(), msg.value() + msg.get_value_size());
+						DEBUG_PRINT("server::message_handler(): PUT: key=%s, value=%s", msg.key(), msg.get_value_string().c_str());
+						try {
+							buff_len = sizeof(buff);
+							ds_->put(msg.key(), msg.value(), msg.get_value_size(), buff, &buff_len, &ts);		
+							if (buff_len>-1) {
+								msg.set_value(buff, buff_len);
+								msg.set_value_timestamp(ts);
+							}
+							msg.set_command(command::OK);
+						}
+						catch (exception &ex) {
+							msg.set_command(command::ERROR);
+							DEBUG_PRINT("server::message_handler(): PUT: Error %s", ex.what());
+						}
+						send(sockfd, (void *) &msg, sizeof(message), 0);
+					}
 
-					// break;
-
-    			case command::ERROR: {
-
-	    			}
 					break;
 
     			case command::SHUT_DOWN: {
+    					msg.clear();
+						msg.set_command(command::OK);
+						send(sockfd, (void *) &msg, sizeof(message), 0);
     					stop();
     				}
 					break;
 
 				default:
+					msg.clear();
+					msg.set_command(command::NONE);
+					send(sockfd, (void *) &msg, sizeof(message), 0);
 					break;
 			}
 		}
@@ -183,6 +203,19 @@ void server::stop() {
 
 	DEBUG_PRINT("server::stop() [end]");	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

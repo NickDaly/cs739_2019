@@ -58,10 +58,8 @@ bool data_store::get(const char *key, const char *value, int *len, int64_t *time
 	if (!validate_key(key)) {
 		throw exception("sdata_store::get(): Invalid key", -1);
 	}
-
-	if (timestamp) { 
-		*timestamp = 0;
-	}
+	
+	*timestamp = 0;
 
 	sql_statement stmt(db_);
 	const char* sql = "SELECT key, value, timestamp from data_store WHERE key = ?";
@@ -74,19 +72,15 @@ bool data_store::get(const char *key, const char *value, int *len, int64_t *time
 
 	 	auto k = stmt.read_text(0);
 	
-		//get the blob length
+		//get the desired blob length
 		int vlen = stmt.read_blob(1, 0, 0);
 		if (vlen > *len) {
 			throw exception("data_store::get(): Insufficient buffer size", -1);	
 		}
 
-		*len = stmt.read_blob(1, value, vlen);
-
-		//return the timestamp		
-		if (timestamp) {
-			*timestamp = stmt.read_int64(2);
-		}
-		
+		stmt.read_blob(1, value, vlen);
+		*len = vlen;
+		*timestamp = stmt.read_int64(2);
 		return true;
 	}
 	else {
@@ -97,36 +91,36 @@ bool data_store::get(const char *key, const char *value, int *len, int64_t *time
 
 bool data_store::put(const char *key, const char *value, int len, const char *ov, int *ov_len, int64_t *timestamp) {	
 
-	// if (!validate_key(key)) {
-	// 	throw exception("sdata_store::put(): Invalid key", -1);
-	// }
+	if (!validate_key(key)) {
+		throw exception("sdata_store::put(): Invalid key", -1);
+	}
 
-	// if (!validate_value(value, len)) {
-	// 	throw exception("sdata_store::put(): Invalid value", -1);
-	// }
+	if (!validate_value(value, len)) {
+		throw exception("sdata_store::put(): Invalid value", -1);
+	}
 
-	// timestamp = 0;
+	sql_statement stmt(db_);
 
-	// sql_statement stmt(db_);
-
-	// auto ts = get_timestamp();
-	
-	// if (get(key, oldvalue, timestamp)) {
-	// 	std::string sql = "UPDATE data_store SET value = ?, timestamp = ? WHERE key = ?";
-	// 	stmt.prepare(sql);
-	// 	stmt.bind_blob(1, newvalue.data(), newvalue.size());
-	// 	stmt.bind_int64(2, ts);
-	// 	stmt.bind_text(3, key);
-	// 	stmt.execute();
-	// }
-	// else {
-	// 	std::string sql = "INSERT INTO data_store VALUES(?, ?, ?)";
-	// 	stmt.prepare(sql);
-	// 	stmt.bind_text(1, key);
-	// 	stmt.bind_blob(2, newvalue.data(), newvalue.size());
-	// 	stmt.bind_int64(3, ts);
-	// 	stmt.execute();
-	// }
+	int64_t ts;
+	if (get(key, ov, ov_len, timestamp)) {
+		ts = get_timestamp();
+		const char *sql = "UPDATE data_store SET value = ?, timestamp = ? WHERE key = ?";
+		stmt.prepare(sql);
+		stmt.bind_blob(1, value, len);
+		stmt.bind_int64(2, ts);
+		stmt.bind_text(3, key);
+		stmt.execute();
+	}
+	else {
+		ts = get_timestamp();
+		const char *sql = "INSERT INTO data_store VALUES(?, ?, ?)";
+		stmt.prepare(sql);
+		stmt.bind_text(1, key);
+		stmt.bind_blob(2, value, len);
+		stmt.bind_int64(3, ts);
+		stmt.execute();
+		*ov_len = -1;
+	}
 
 	return true;
 }
