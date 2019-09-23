@@ -13,17 +13,18 @@ enum class command: int32_t
 	NONE = 0,
 	CHK,
 	OK,
-    GET,
-    PUT,
-    NO_VAL,
-    ERROR,
-    SHUT_DOWN
+	GET,
+	PUT,
+	NO_VAL,
+	ERROR,
+	SHUT_DOWN
 };
 
 
 typedef struct header {
 	int64_t id;
 	command cmd;
+	int32_t flag;
 	int64_t param;
 	int32_t key_size;
 	int32_t value_size;
