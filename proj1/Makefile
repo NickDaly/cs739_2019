@@ -39,6 +39,7 @@ OBJ=sqlite3.o \
 	datastore.o \
 	message.o \
 	server.o \
+	client.o \
 	lib739kv.o \
 
 #list of executable to build  

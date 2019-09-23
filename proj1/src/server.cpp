@@ -42,7 +42,7 @@ void server::serve() {
 	}
     
     if (listen(sockfd_, 5)!=0) {
-    	throw exception("server::serve() Error binding socket to port", errno);
+    	throw exception("server::serve() Error listening to socket", errno);
     }
 
 	running_ = true;
@@ -88,7 +88,7 @@ void server::message_handler() {
 			
 			message msg;
 			int len = sizeof(msg);
-			int n = read(sockfd, (char *) &msg, len);
+			int n = recv(sockfd, (void *) &msg, len, MSG_WAITALL);
 
 			if (n < len) {
 				DEBUG_PRINT("server::message_handler() Error reading message");

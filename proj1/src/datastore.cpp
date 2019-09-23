@@ -12,7 +12,12 @@ int64_t get_timestamp() {
 }
 
 
-data_store::data_store(std::string &filename) {
+data_store::data_store() {
+	
+}
+
+
+data_store::data_store(const std::string &filename) {
 	DEBUG_PRINT("data_store::data_store() [begin]");
 	//file:/home/fred/data.db
 	DEBUG_PRINT("  Creating db connection to '%s'...", filename.c_str());

@@ -9,14 +9,19 @@
 #include "sqlite3.h"
 #include "sqlstatement.h"
 
+
 #define MAX_KEY_LEN 128
 #define MAX_VALUE_LEN 2048
 
+
 using value_p = std::shared_ptr<std::vector<char>>;
+
+int64_t get_timestamp();
 
 class data_store {
 public:
-	data_store(std::string &filename);
+	data_store();
+	data_store(const std::string &filename);
 	virtual ~data_store();
 
 	virtual bool get(std::string &key, std::vector<char> &value, int64_t &timestamp);
@@ -24,43 +29,43 @@ public:
 	virtual bool validate_key(const std::string &key);
 	virtual bool validate_value(const std::vector<char> &data);
 
-	bool get(const char *key, std::vector<char> &value, int64_t &timestamp) {
+	virtual bool get(const char *key, std::vector<char> &value, int64_t &timestamp) {
 		std::string s(key);
 		return get(s, value, timestamp);
 	}
 
-	bool get(std::string &key, std::vector<char> &value) {
+	virtual bool get(std::string &key, std::vector<char> &value) {
 		int64_t ts;
 		return get(key, value, ts);
 	}	
 	
-	bool put(const char *key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {
+	virtual bool put(const char *key, std::vector<char> &newvalue, std::vector<char> &oldvalue, int64_t &timestamp) {
 		std::string s(key);
 		return put(s, newvalue, oldvalue, timestamp);
 	}
 
-	bool put(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue) {
+	virtual bool put(std::string &key, std::vector<char> &newvalue, std::vector<char> &oldvalue) {
 		int64_t ts;
 		return put(key, newvalue, oldvalue, ts);
 	}
 
-	bool put(std::string &key, std::vector<char> &newvalue) {
+	virtual bool put(std::string &key, std::vector<char> &newvalue) {
 		std::vector<char> oldvalue;
 		return put(key, newvalue, oldvalue);		
 	}
 	
-	bool put(const char *key, std::vector<char> &newvalue) {
+	virtual bool put(const char *key, std::vector<char> &newvalue) {
 		std::string s(key);
 		return put(s, newvalue);
 	}
 
-	bool put(const char *key, const char *value) {
+	virtual bool put(const char *key, const char *value) {
 		std::vector<char> data(value, value + strlen(value));
 		std::string s(key);
 		return put(s, data);
 	}
 
-	bool put(const char *key, const char *value, std::vector<char> &oldvalue) {
+	virtual bool put(const char *key, const char *value, std::vector<char> &oldvalue) {
 		std::vector<char> data(value, value + strlen(value));
 		std::string s(key);
 		return put(s, data, oldvalue);

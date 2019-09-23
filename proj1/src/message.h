@@ -56,7 +56,7 @@ private:
 	void set_key_size(int len);
 	void set_value_size(int len);
 
-	header_t header_;
-	char payload[MSG_SIZE-sizeof(header_t)];	
+	header_t header_ = { };
+	char payload[MSG_SIZE-sizeof(header_t)] = {0};
 };
 #endif

@@ -15,7 +15,6 @@ message::message(command cmd) {
 	header_.cmd = cmd;
 }
 
-
 message::~message() {
 
 }
