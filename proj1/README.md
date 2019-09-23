@@ -23,7 +23,7 @@ Each daemon holds a distributed KV store. Daemon processors are identical except
 ### Need to have ability to monitor daemon across servers?
 
 
-##IPC
+## IPC
 For the time being we use TCP/IP (might not be the most efficient, but simple enough to implement) for our IPC. 
     +-------------+
     | heder       |
