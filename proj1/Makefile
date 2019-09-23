@@ -3,8 +3,6 @@ UNAME := $(shell uname)
 DEBUG=0
 
 SLIB=lib739kv.so
-EXEC=test
-EXECS=test test_server
 
 VPATH=./src/:./testing
 OBJDIR=./obj/
@@ -43,7 +41,7 @@ OBJ=sqlite3.o \
 	lib739kv.o \
 
 #list of executable to build  
-EXEC = test test_server test_client kvdaemon
+EXEC = test test_server test_client kvdaemon kvservice
 
 EXECOBJA = $(addprefix $(OBJDIR), $(EXEC))
 
