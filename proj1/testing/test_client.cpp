@@ -7,7 +7,7 @@ int main() {
 	std::string host = "localhost";
 	client c(host, 52123);
 
-	std::cout << "Enter key,value pair, enter 'q' for key to shutdown the server.";
+	std::cout << "Enter key,value pair, enter 'q' for key to shutdown the server." << std::endl;
 
 	while (1) {
 		
@@ -20,6 +20,7 @@ int main() {
 		if (key=="q") {
 			message m(command::SHUT_DOWN);
 			c.send_message(m, m);
+			break;
 		}
 		
 		std::cout << "Enter a value:";
@@ -34,7 +35,7 @@ int main() {
 		c.send_message(msg, res);
 	}
 
-	message msg(command::SHUT_DOWN);
-	c.send_message(msg, msg);
+	// message msg(command::SHUT_DOWN);
+	// c.send_message(msg, msg);
 
 }

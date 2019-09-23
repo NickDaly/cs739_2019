@@ -145,8 +145,6 @@ void server::message_handler() {
 					break;
 
     			case command::PUT: {
-    					msg.clear();
-						std::vector<char> v(msg.value(), msg.value() + msg.get_value_size());
 						DEBUG_PRINT("server::message_handler(): PUT: key=%s, value=%s", msg.key(), msg.get_value_string().c_str());
 						try {
 							buff_len = sizeof(buff);
@@ -155,9 +153,11 @@ void server::message_handler() {
 								msg.set_value(buff, buff_len);
 								msg.set_value_timestamp(ts);
 							}
+							msg.clear();
 							msg.set_command(command::OK);
 						}
 						catch (exception &ex) {
+							msg.clear();
 							msg.set_command(command::ERROR);
 							DEBUG_PRINT("server::message_handler(): PUT: Error %s", ex.what());
 						}
